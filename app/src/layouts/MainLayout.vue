@@ -30,11 +30,6 @@
         >
           Stuff
         </q-item-label>
-        <!-- <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        /> -->
       </q-list>
     </q-drawer> -->
 
@@ -45,7 +40,6 @@
 </template>
 
 <script>
-import EssentialLink from "components/EssentialLink.vue";
 
 const linksData = [
   {
@@ -94,9 +88,6 @@ const linksData = [
 
 export default {
   name: "MainLayout",
-  components: {
-    EssentialLink,
-  },
   data() {
     return {
       leftDrawerOpen: false,

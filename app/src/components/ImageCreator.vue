@@ -16,11 +16,12 @@
     <div class="prompt-holder">
       <q-input
         class="prompt-input"
-        v-model="prompt"
+        v-model="defaultPrompt"
         placeholder="Enter a prompt..."
         @keyup.enter="submitPrompt"
         outlined
         clearable
+        autogrow
       />
       <q-btn
         class="q-ml-sm"
@@ -28,6 +29,21 @@
         label="Generate"
         unelevated
         @click="submitPrompt"
+      />
+    </div>
+    <div class="art-styles-holder">
+      <q-checkbox
+        v-for="style in artStyles"
+        :key="style"
+        v-model="artStylesModel"
+        :val="style"
+        keep-color
+        color="teal"
+        checked-icon="star"
+        unchecked-icon="star_border"
+        :label="style"
+        label-position="right"
+        dense
       />
     </div>
   </div>
@@ -43,11 +59,50 @@ export default {
   name: "ImageCreator",
   data() {
     return {
-      prompt: "",
+      defaultPrompt: "",
       imageUrl: "",
       imageUrls: [],
       imageLoading: false,
+      artStyles: [
+        "3D",
+        "abstract",
+        "anime",
+        "cartoon",
+        "comic book",
+        "cyber punk",
+        "digital art",
+        "fantasy",
+        "graffiti",
+        "hand drawn sketch",
+        "hyperrealist",
+        "low poly",
+        "matisse",
+        "minimalist",
+        "painting",
+        "pixel",
+        "pop art",
+        "portrait",
+        "renaissance",
+        "synthwave",
+        "watercolor",
+        "vaporwave",
+      ].map((style) =>
+        style
+          .split(" ")
+          .map((word) => word[0].toUpperCase() + word.slice(1))
+          .join(" ")
+      ),
+      artStylesModel: [],
     };
+  },
+  computed: {
+    prompt() {
+      let prompt = this.defaultPrompt;
+      if (this.artStylesModel.length > 0) {
+        prompt += ` ${this.artStylesModel.join(", ")}`;
+      }
+      return prompt;
+    },
   },
   methods: {
     async submitPrompt() {
@@ -78,12 +133,12 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 50px);
   padding: 48px;
 }
 
 .display-container {
-  width: 90%;
+  width: 100%;
   height: 85%;
   max-height: 85%;
   margin-bottom: 24px;
@@ -115,7 +170,7 @@ export default {
 }
 
 .prompt-holder {
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   gap: 16;
@@ -123,5 +178,17 @@ export default {
   .prompt-input {
     flex: 1;
   }
+}
+
+.art-styles-holder {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  background: #f6f5f5;
+  padding: 8px;
+  border-radius: 8px;
 }
 </style>
