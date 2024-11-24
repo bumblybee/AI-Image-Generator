@@ -3,7 +3,7 @@
     <div class="display-container">
       <div v-if="!imageLoading" class="image-container">
         <div v-for="url in imageUrls" :key="url" class="image-holder">
-          <img :src="url" />
+          <img :src="url" @click="handleImageClick" />
         </div>
       </div>
       <div
@@ -46,6 +46,20 @@
         dense
       />
     </div>
+    <q-dialog class="image-modal" v-model="imageExpanded" auto-close>
+      <q-card class="relative-position">
+        <q-btn
+          class="absolute-top-right q-ma-sm"
+          color="teal"
+          icon="download"
+          flat
+          dense
+          round
+          @click="downloadImage"
+        />
+        <img :src="imageUrl" />
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -63,6 +77,7 @@ export default {
       imageUrl: "",
       imageUrls: [],
       imageLoading: false,
+      imageExpanded: false,
       artStyles: [
         "3D",
         "abstract",
@@ -112,7 +127,7 @@ export default {
         const response = await openai.createImage({
           prompt: this.prompt,
           n: 4,
-          size: "256x256",
+          size: "1024x1024",
         });
 
         this.imageUrls = response.data.data.map((item) => item.url);
@@ -123,6 +138,27 @@ export default {
         console.log(error);
         this.imageLoading = false;
       }
+    },
+    handleImageClick(event) {
+      this.imageUrl = event.target.src;
+      this.imageExpanded = true;
+    },
+    downloadImage() {
+      var link = document.createElement("a");
+      link.href = this.imageUrl;
+      link.download = `${this.prompt.slice(0, 10).replace(/\s/g, "-")}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removPeChild(link);
+    },
+    toDataURL(url) {
+      return fetch(url)
+        .then((response) => {
+          return response.blob();
+        })
+        .then((blob) => {
+          return URL.createObjectURL(blob);
+        });
     },
   },
 };
@@ -165,6 +201,7 @@ export default {
       width: 100%;
       max-width: 100%;
       border-radius: 8px;
+      cursor: pointer;
     }
   }
 }
@@ -190,5 +227,15 @@ export default {
   background: #f6f5f5;
   padding: 8px;
   border-radius: 8px;
+}
+
+.image-modal {
+  min-width: 80%;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 </style>
